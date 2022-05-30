@@ -1,8 +1,22 @@
-import React from "react";
+import React, {useRef, useState} from "react";
 
-export default () => (
-  <>
-    <h1>Welcome to React Vite Micro App!</h1>
-    <p>Hard to get more minimal than this React app.</p>
-  </>
-);
+import Objects from './objects';
+
+const App = () => {
+
+  const container = useRef(null);
+
+  return(
+    <>
+      <h1>Canvas Object Movement based on Vector</h1>
+      
+      <div ref={container}>
+        <Objects 
+          container={container}
+        />
+      </div>
+    </>
+  )
+};
+
+export default App;
