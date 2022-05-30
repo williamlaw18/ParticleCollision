@@ -1,55 +1,46 @@
-# Nano React App Default Javascript Template
+# A Javascript Particle Collider!
 
-The default template project for [nano-react-app](https://github.com/nano-react-app/nano-react-app).
+A Particle collision system made in Javascript, React and HTML canvas.
 
-- `npm start` — This will spawn a development server with a default port of `3000`.
-- `npm run build` — This will output a production build in the `dist` directory.
+## Vite
 
-## Custom port
+This project uses Vite as a front end bundler and tooling.
+I went with vite because it is so simple to spin up a project as well as being incredibly lightweight.
 
-You can use the `-p` flag to specify a port for development. To do this, you can either run `npm start` with an additional flag:
+### Usage
 
-```
-npm start -- --port 1234
-```
+`npm install` - Install node packages
+`npm start` - Starts the project on a local host
 
-Or edit the `start` script directly:
+## This project intends to implement
 
-```
-vite --port 1234
-```
+- Generate a dynamic array of particles.
+- Animate their position on a HTML canvas.
+- Calculate the movement vectors and velocity of each particle.
+- Detect a collision between different object shapes.
+- Find the sum vector normal between two colliding particles and apply a new vector in the relevant direction.
+- Conserve momentum between the collision of particles.
+- Apply a gravitational force.
+- Particle settings controller
 
-## Adding styles
+## Particle Controller
 
-You can use CSS files with simple ES2015 `import` statements anywhere in your Javascript:
+- Gravity - Toggles gravity
 
-```js
-import "./index.css";
-```
+## How it works (currently)
 
-## Babel transforms
+UseEffect is run every time the `object.jsx` component settings are updated.
+This will reset the settings of the canvas size and particle settings.
 
-The Babel preset [babel-preset-nano-react-app](https://github.com/nano-react-app/babel-preset-nano-react-app) is used to support the same transforms that Create React App supports.
+Performing a mouse click on the canvas will run a function that will handle the `createCircle` method.
+This adds a circle to the objects array with the mouse position and vector values assigned.
 
-The Babel configuration lives inside `package.json` and will override an external `.babelrc` file, so if you want to use `.babelrc` remember to delete the `babel` property inside `package.json`.
+The `drawObjects` method is run on an `requestAnimationFrame` cycle which is called every frame by the browser.
+This accesses the HTML canvas and draws each shape based on its settings in that particular cycle. 
 
-
-## Deploy to GitHub Pages
-
-You can also deploy your project using GitHub pages.
-First install the `gh-pages` [package](https://github.com/tschaub/gh-pages):
-
-`npm i -D gh-pages`
-
-Use the following scripts for deployment:
-
-```
-"scripts": {
-  "start": "vite",
-  "build": "vite build",
-  "predeploy": "rm -rf dist && vite build",
-  "deploy": "gh-pages -d dist"
-},
-```
-
-Then follow the normal procedure in GitHub Pages and select the `gh-pages` branch.
+The `detectCollisions` method is also run on the `requestAnimationFrame` cycle.
+This compares the distance between the objects and updates the values of particles
+When a collision is made, a normalised vector is calculated as the negative sum of the two particle vectors, then divided by the distance between them.
+The collision normal is then used to calculate the corrosponding velocity for each particle.
+The impulse is then calculated from the speed which is used to determine the loss of velocity from each collision depending on the size of the two particles.
+Finally, a gravity vector is added to each particle every frame when the particle is not collided with the floor.
