@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 
 const Objects = (
-    {container }) => {
+    {loading, container, settings = {
+        gravity: true
+    }}) => {
     
     const canvasRef = useRef()
     const objects = useRef([])
@@ -14,14 +16,8 @@ const Objects = (
 
     const initCanvas = () => {
         setCanvasArea();
-        createCircle(100, 400, 70, 3, -8, 0.2)
         window.addEventListener('resize', setCanvasArea);
         animateRef.current = requestAnimationFrame(animate);
-    }
-
-    //Strips floating point number
-    function strip(number) {
-        return (parseFloat(number.toFixed(2)));
     }
 
     //Sets canvas area to container size
@@ -30,6 +26,11 @@ const Objects = (
             setCanvasHeight(container.current.offsetHeight)
             setCanvasWidth(container.current.offsetWidth);
         }
+    }
+    
+    //Strips floating point number
+    function strip(number) {
+        return (parseFloat(number.toFixed(2)));
     }
 
     //adds object to list
@@ -42,7 +43,8 @@ const Objects = (
             vx: vx,
             vy: vy,
             cor: cor,
-            isColliding: false
+            isColliding: false,
+            isFloorColiding: false
         };
         objects.current = [...objects.current, object]
     }
@@ -97,11 +99,18 @@ const Objects = (
             //Sets coefficient of restitution for bounding box
             let cor = 0.95
             //Applies change in vector direction based on bounding box collision
-            if (obj1.y + obj1.radius >= canvasRef.current.offsetHeight || obj1.y - obj1.radius <= 0) obj1.vy = strip(-obj1.vy) * cor;
-            if (obj1.x + obj1.radius >= canvasRef.current.offsetWidth || obj1.x - obj1.radius <= 0) obj1.vx = strip(-obj1.vx) * cor;
+            if (obj1.y + obj1.radius >= canvasRef.current.offsetHeight || obj1.y - obj1.radius <= 0){
+                obj1.vy = strip(-obj1.vy) * cor;
+                obj1.isFloorColiding = true
+            } else { obj1.isFloorColiding = false}
+            if (obj1.x + obj1.radius >= canvasRef.current.offsetWidth || obj1.x - obj1.radius <= 0){
+                obj1.vx = strip(-obj1.vx) * cor;
+            } 
 
             // Apply acceleration
-            if (obj1.y <= canvasRef.current.offsetHeight - obj1.radius) obj1.vy = obj1.vy + gravity.current;
+            if (settings.gravity == true){
+                if (!obj1.isFloorColiding) obj1.vy = obj1.vy + gravity.current;
+            }
         });
     }
 
@@ -130,12 +139,9 @@ const Objects = (
         animateRef.current = requestAnimationFrame(animate);
     }
 
-    // setInterval(() => {
-    //     animate()
-    // }, 100)
-
     const handleCanvasClick = (e) => {
-        createCircle(e.nativeEvent.offsetX, e.nativeEvent.offsetY, 30, -0.6, 0.4, 0.8)
+        let randRadius = (10 + Math.floor(Math.random() * (70 - 5)));
+        createCircle(e.nativeEvent.offsetX, e.nativeEvent.offsetY, randRadius, -0.6, -3, 0.8)
     }
 
     //Component update
@@ -145,7 +151,7 @@ const Objects = (
             window.removeEventListener('resize', setCanvasArea);
             cancelAnimationFrame(animateRef.current);
         };
-    }, []);
+    }, [settings]);
 
     return (
         <React.Fragment>
