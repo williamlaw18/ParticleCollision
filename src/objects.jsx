@@ -13,7 +13,7 @@ const Objects = (
 
     const initCanvas = () => {
         setCanvasArea();
-        createCircle(100, 100, 50, [0.3, 0.5])
+        createCircle(100, 400, 50, 0.7, -0.3)
         window.addEventListener('resize', setCanvasArea);
         animateRef.current = requestAnimationFrame(animate);
     }
@@ -27,13 +27,14 @@ const Objects = (
     }
 
     //adds object to list
-    const createCircle = (x, y, radius, vector) => {
+    const createCircle = (x, y, radius, vx, vy) => {
         const object = {
             type: 'circle',
             x: x,
             y: y,
             radius: radius,
-            vector: vector,
+            vx: vx,
+            vy: vy,
             isColliding: false
         };
         objects.current = [...objects.current, object]
@@ -47,6 +48,7 @@ const Objects = (
     }
 
     const detectCollisions = () => {
+
         let obj2;
         // Reset collision state of all objects
         objects.current.forEach((object) => {
@@ -57,13 +59,16 @@ const Objects = (
         objects.current.forEach((obj1, index) => {
             for (let j = index + 1; j < objects.current.length; j++){
                 obj2 = objects.current[j];
-    
+                
                 // Compare object1 with object2
                 if (circIntersect(obj1.x, obj1.y, obj1.radius, obj2.x, obj2.y, obj2.radius)) {
                     obj1.isColliding = true;
                     obj2.isColliding = true;
                 }
             }
+
+            if (obj1.y + obj1.radius >= canvasRef.current.offsetHeight || obj1.y - obj1.radius <= 0) obj1.vy = -obj1.vy
+            if (obj1.x + obj1.radius >= canvasRef.current.offsetWidth || obj1.x - obj1.radius <= 0) obj1.vx = -obj1.vx
         });
     }
 
@@ -74,14 +79,22 @@ const Objects = (
         
         objects.current.forEach((object) => {
 
-            object.x = object.x + object.vector[0]
-            object.y = object.y + object.vector[1]
-
-            console.log(object.isColliding)
+            object.x = object.x + object.vx
+            object.y = object.y + object.vy
+            object.x = (parseFloat(object.x.toFixed(2)))
+            object.y = (parseFloat(object.y.toFixed(2)))
 
             ctx.beginPath();
             ctx.arc(object.x, object.y, object.radius, 0, 2 * Math.PI, false)
+            object.isColliding ? ctx.fillStyle = "red": ctx.fillStyle = "lightblue"
+            ctx.fill();
             ctx.stroke();
+
+            //Visual vector direction
+            ctx.beginPath();
+            ctx.moveTo(object.x, object.y);
+            ctx.lineTo(object.x + (object.vx * 100), object.y + (object.vy * 100))
+            ctx.stroke()
         })
         
     };
@@ -90,14 +103,16 @@ const Objects = (
     const animate = () => {
         detectCollisions();
         drawObjects();
-        // animateRef.current = requestAnimationFrame(animate);
+        animateRef.current = requestAnimationFrame(animate);
     }
-    setInterval(() => {
-        animate()
-    }, 100);
+
+    // setInterval(() => {
+    //     animate()
+    // }, 20)
+
 
     const handleCanvasClick = (e) => {
-        createCircle(e.nativeEvent.offsetX, e.nativeEvent.offsetY, 50, [-0.3, 0.5])
+        createCircle(e.nativeEvent.offsetX, e.nativeEvent.offsetY, 50, -0.2, 0.4)
     }
 
     //Component update
