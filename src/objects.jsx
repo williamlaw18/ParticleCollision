@@ -13,7 +13,7 @@ const Objects = (
 
     const initCanvas = () => {
         setCanvasArea();
-        createCircle(100, 400, 50, 0.7, -0.3)
+        createCircle(100, 400, 50, 1, -0.3)
         window.addEventListener('resize', setCanvasArea);
         animateRef.current = requestAnimationFrame(animate);
     }
@@ -35,16 +35,10 @@ const Objects = (
             radius: radius,
             vx: vx,
             vy: vy,
+            col: vx, vy,
             isColliding: false
         };
         objects.current = [...objects.current, object]
-    }
-
-    const circIntersect = (x1, y1, r1, x2, y2, r2) => {
-        // Calculate the distance between the two circles
-        let squareDistance = (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2);
-        // if distance is smaller or equal to the sum two radius
-        return squareDistance <= ((r1 + r2) * (r1 + r2))
     }
 
     const detectCollisions = () => {
@@ -61,9 +55,22 @@ const Objects = (
                 obj2 = objects.current[j];
                 
                 // Compare object1 with object2
-                if (circIntersect(obj1.x, obj1.y, obj1.radius, obj2.x, obj2.y, obj2.radius)) {
+                let dist = Math.sqrt( Math.pow((obj1.x-obj2.x), 2) + Math.pow((obj1.y-obj2.y), 2) );
+
+                if (dist <= (obj1.radius + obj2.radius)) {
                     obj1.isColliding = true;
                     obj2.isColliding = true;
+
+                    let vCollision = {x: parseFloat(((obj2.x - obj1.x)).toFixed(2)), y: parseFloat(((obj2.y - obj1.y)).toFixed(2))};
+                    let vCollisionNorm = {x: vCollision.x / dist, y: vCollision.y / dist};
+
+                    let vRelativeVelocity = {x: obj1.vx - obj2.vx, y: obj1.vy - obj2.vy};
+                    let speed = vRelativeVelocity.x * vCollisionNorm.x + vRelativeVelocity.y * vCollisionNorm.y;
+
+                    obj1.vx -= (speed * vCollisionNorm.x);
+                    obj1.vy -= (speed * vCollisionNorm.y);
+                    obj2.vx += (speed * vCollisionNorm.x);
+                    obj2.vy += (speed * vCollisionNorm.y);
                 }
             }
 
@@ -91,10 +98,10 @@ const Objects = (
             ctx.stroke();
 
             //Visual vector direction
-            ctx.beginPath();
-            ctx.moveTo(object.x, object.y);
-            ctx.lineTo(object.x + (object.vx * 100), object.y + (object.vy * 100))
-            ctx.stroke()
+            // ctx.beginPath();
+            // ctx.moveTo(object.x, object.y);
+            // ctx.lineTo(object.x + (object.vx * 100), object.y + (object.vy * 100))
+            // ctx.stroke()
         })
         
     };
@@ -108,11 +115,11 @@ const Objects = (
 
     // setInterval(() => {
     //     animate()
-    // }, 20)
+    // }, 50)
 
 
     const handleCanvasClick = (e) => {
-        createCircle(e.nativeEvent.offsetX, e.nativeEvent.offsetY, 50, -0.2, 0.4)
+        createCircle(e.nativeEvent.offsetX, e.nativeEvent.offsetY, 50, -0.6, 0.8)
     }
 
     //Component update
