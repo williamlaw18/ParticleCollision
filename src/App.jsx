@@ -1,8 +1,28 @@
-import React from "react";
+import React, {useRef, useState, useEffect} from "react";
 
-export default () => (
-  <>
-    <h1>Welcome to React Vite Micro App!</h1>
-    <p>Hard to get more minimal than this React app.</p>
-  </>
-);
+import Objects from './objects';
+import ParticleController from './particleController';
+
+
+const App = () => {
+
+  const container = useRef(null);
+
+  const [particleSettings, setParticleSettings] = useState({});
+
+  return(
+    <>
+      <h1>Canvas Object Movement based on Vector</h1>
+      <p>{particleSettings.gravity}</p>
+      <ParticleController setParticles={setParticleSettings}/>
+      <div ref={container}>
+        <Objects 
+          settings={particleSettings}
+          container={container}
+        />
+      </div>
+    </>
+  )
+};
+
+export default App;
