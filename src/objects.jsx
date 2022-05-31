@@ -10,12 +10,14 @@ const Objects = (
     const gravity = useRef(0.1);
 
     const animateRef = useRef();
+    const interval = useRef(null)
     
     const [canvasHeight, setCanvasHeight] = useState(500);
     const [canvasWidth, setCanvasWidth] = useState(500);
 
     const initCanvas = () => {
         setCanvasArea();
+        resetInterval()
         window.addEventListener('resize', setCanvasArea);
         animateRef.current = requestAnimationFrame(animate);
     }
@@ -23,6 +25,7 @@ const Objects = (
     //Sets canvas area to container size
     const setCanvasArea = () => {
         if (container.current != null){
+            console.log(container.current.offsetHeight)
             setCanvasHeight(container.current.offsetHeight)
             setCanvasWidth(container.current.offsetWidth);
         }
@@ -83,8 +86,13 @@ const Objects = (
                     let vRelativeVelocity = {x: strip(obj1.vx - obj2.vx), y: strip(obj1.vy - obj2.vy)};
                     let speed = strip(vRelativeVelocity.x * vCollisionNorm.x + vRelativeVelocity.y * vCollisionNorm.y);
 
+                    //kill calculation if speed between objects is 0
+                    if (speed < 0){
+                        break;
+                    }
+
                     //Apply loss of velocity
-                    // speed *= Math.min(obj1.cor, obj2.cor);
+                    speed *= Math.min(obj1.cor, obj2.cor);
 
                     //calcultes the mass impulse that effects the change in velocity
                     let impulse = strip(2 * speed / (obj1.radius + obj2.radius));
@@ -139,6 +147,24 @@ const Objects = (
         animateRef.current = requestAnimationFrame(animate);
     }
 
+    //Rate of random object
+    const resetInterval = () => {
+        if (interval.current != null) clearInterval(interval.current);
+        interval.current = setInterval(() => {
+            randomObject();
+        }, 500)
+    }
+
+    //Creates particle randomly
+    const randomObject = () => {
+        if (canvasRef.current != null){
+            let randRadius = (10 + Math.floor(Math.random() * (30 - 5)));
+            let randomX = 100 + Math.floor(Math.random() * (canvasRef.current.width - 100));
+            let randomY = 100 + Math.floor(Math.random() * (canvasRef.current.height - 100));
+            createCircle(randomX, randomY, randRadius, -0.6, -3, 0.8)
+        }
+    }
+
     const handleCanvasClick = (e) => {
         let randRadius = (10 + Math.floor(Math.random() * (70 - 5)));
         createCircle(e.nativeEvent.offsetX, e.nativeEvent.offsetY, randRadius, -0.6, -3, 0.8)
@@ -148,6 +174,7 @@ const Objects = (
     useEffect(() => {     
         initCanvas();
         return () => {
+            clearInterval(interval.current);
             window.removeEventListener('resize', setCanvasArea);
             cancelAnimationFrame(animateRef.current);
         };
