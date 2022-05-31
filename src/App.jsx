@@ -10,10 +10,13 @@ const App = () => {
 
   const [particleSettings, setParticleSettings] = useState({});
 
+  useEffect(() => {
+    console.log(particleSettings.gravity)
+  }, [particleSettings])
+
   return(
     <>
       <h1>Canvas Object Movement based on Vector</h1>
-      <p>{particleSettings.gravity}</p>
       <ParticleController setParticles={setParticleSettings}/>
       <div ref={container} style={{'height': 'calc(100vh - 150px)'}}>
         <Objects 
