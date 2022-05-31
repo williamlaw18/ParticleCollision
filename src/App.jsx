@@ -7,12 +7,7 @@ import ParticleController from './particleController';
 const App = () => {
 
   const container = useRef(null);
-
   const [particleSettings, setParticleSettings] = useState({});
-
-  useEffect(() => {
-    console.log(particleSettings.gravity)
-  }, [particleSettings])
 
   return(
     <>

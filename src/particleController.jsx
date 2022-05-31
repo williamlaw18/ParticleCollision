@@ -14,8 +14,9 @@ const ParticleController = ({setParticles}) => {
         container: true,
         minRadius: 10,
         maxRadius: 100,
-        vy: 0,
-        vx: 0
+        vy: -0.4,
+        vx: 1,
+        maxObjects: 300
     })
     
     const updateGravity = (value) => {
@@ -130,10 +131,6 @@ const ParticleController = ({setParticles}) => {
                  <li className='particleController__input'>
                     <input id="xMove" type="range" onChange={(input) => updateVelocityX(input.target.value)} />
                     <label htmlFor="xMove">X Axis Velocity</label>
-                </li>
-                <li className='particleController__input'>
-                    <input id="fadeSpeed" type="range" onChange={(input) => updateFadeSpeed(input.target.value)} />
-                    <label htmlFor="maxSize">Fade Speed</label>
                 </li>
 
                 <li className='particleController__color'>

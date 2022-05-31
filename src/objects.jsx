@@ -10,8 +10,9 @@ const Objects = (
         maxRadius: 100,
         collisions: true,
         container: true,
-        vy: 0,
-        vx: 0
+        vy: -1,
+        vx: 3,
+        maxObjects: 300
     }}) => {
     
     const canvasRef = useRef()
@@ -139,6 +140,11 @@ const Objects = (
     const drawObjects = () => {
         const ctx = canvasRef.current?.getContext('2d')
         ctx.clearRect(0, 0, canvasRef.current.offsetWidth, canvasRef.current.offsetHeight);
+
+        if (objects.current.length >= settings.maxObjects){
+            objects.current = objects.current.filter((item, index) => index > 0);
+        }
+
         objects.current.forEach((object) => {
 
             object.x = strip(object.x) + strip(object.vx)
@@ -177,7 +183,7 @@ const Objects = (
     //Creates particle randomly
     const randomObject = () => {
         if (canvasRef.current != null){
-            let randRadius = (10 + Math.floor(Math.random() * (30 - 5)));
+            let randRadius = (10 + Math.floor(Math.random() * (40 - 3)));
             let randomX = 100 + Math.floor(Math.random() * (canvasRef.current.width - 100));
             let randomY = 100 + Math.floor(Math.random() * (canvasRef.current.height - 100));
             createCircle(randomX, randomY, randRadius, settings.vx, settings.vy, 0.8)
