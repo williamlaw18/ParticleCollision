@@ -7,15 +7,13 @@ import ParticleController from './particleController';
 const App = () => {
 
   const container = useRef(null);
-
   const [particleSettings, setParticleSettings] = useState({});
 
   return(
     <>
       <h1>Canvas Object Movement based on Vector</h1>
-      <p>{particleSettings.gravity}</p>
       <ParticleController setParticles={setParticleSettings}/>
-      <div ref={container}>
+      <div ref={container} style={{'height': 'calc(100vh - 150px)'}}>
         <Objects 
           settings={particleSettings}
           container={container}
